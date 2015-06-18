@@ -5,11 +5,17 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 
 public class MainActivity extends ActionBarActivity implements LocationListener{
+
+
+    public MainActivity() {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +51,14 @@ public class MainActivity extends ActionBarActivity implements LocationListener{
 
     @Override
     public void onLocationChanged(Location location) {
-
+        if(location != null) {
+            Double longitude = location.getLongitude();   //取得經度
+            Double latitude = location.getLatitude();     //取得緯度
+            Toast.makeText(this, "正在定位", Toast.LENGTH_LONG).show();
+        }
+        else {
+            Toast.makeText(this, "無法定位座標", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -60,6 +73,6 @@ public class MainActivity extends ActionBarActivity implements LocationListener{
 
     @Override
     public void onProviderDisabled(String provider) {
-
+        Toast.makeText(this, "請開啟gps或3G網路", Toast.LENGTH_LONG).show();
     }
 }
