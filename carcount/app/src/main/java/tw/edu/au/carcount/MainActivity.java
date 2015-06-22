@@ -8,12 +8,18 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
 public class MainActivity extends ActionBarActivity implements LocationListener{
-
-
+    TextView jingdu;
+    TextView weidu;
+    TextView distance;
+    LocationManager locationManager;
+    Double endlongitude=null;
+    Double endlatitude=null;
+    boolean ck=false;
     public MainActivity() {
     }
 
@@ -21,11 +27,24 @@ public class MainActivity extends ActionBarActivity implements LocationListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        LocationManager locationManager=(LocationManager)getSystemService(getApplicationContext().LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, this);
+        jingdu = (TextView)findViewById(R.id.jingdu);
+        weidu = (TextView)findViewById(R.id.weidu);
+        distance = (TextView)findViewById(R.id.distance);
+        jingdu.setText("0000");
+        weidu.setText("0000");
+        distance.setText("0000");
+        locationManager=(LocationManager)getSystemService(getApplicationContext().LOCATION_SERVICE);
+
+        Log.i("map", "oncreat");
 
     }
 
+
+    @Override
+    protected void onResume() {
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000,10, this);
+        super.onResume();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -53,13 +72,42 @@ public class MainActivity extends ActionBarActivity implements LocationListener{
     public void onLocationChanged(Location location) {
         if(location != null) {
             Double longitude = location.getLongitude();   //取得經度
+            jingdu.setText(String.valueOf(longitude));
             Double latitude = location.getLatitude();     //取得緯度
-            Toast.makeText(this, "正在定位", Toast.LENGTH_LONG).show();
+            weidu.setText(String.valueOf(latitude));
+            if((longitude != endlongitude || latitude != endlatitude ) &&ck){
+                //float[] results=new float[1];
+                //Location.distanceBetween(longitude, latitude, endlongitude, endlatitude, results);
+                //distance (longitude, latitude, endlongitude, endlatitude);
+                distance.setText(String.valueOf(distance(latitude, longitude, endlatitude, endlongitude)));
+                //distance.setText(String.valueOf(endlatitude)+" "+String.valueOf(endlongitude));
+
+            }
+
+            endlatitude = latitude;
+            endlongitude = longitude ;
         }
         else {
             Toast.makeText(this, "無法定位座標", Toast.LENGTH_LONG).show();
         }
+        ck=true;
     }
+    private double distance(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        return (dist);
+    }
+
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+    private double rad2deg(double rad) {
+        return (rad * 180.0 / Math.PI);
+    }
+
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
