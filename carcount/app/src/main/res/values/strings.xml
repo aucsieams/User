@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">carcount</string>
 
-    <string name="hello_world">Hello world!</string>
+    <string name="hello_world">經度：</string>
+    <string name="hello_world2">緯度：</string>
+    <string name="hello_world3">累積距離：</string>
     <string name="action_settings">Settings</string>
 </resources>

@@ -8,18 +8,25 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
 public class MainActivity extends ActionBarActivity implements LocationListener{
+    Button start;
+    Button pause;
+    Button stop;
     TextView jingdu;
     TextView weidu;
     TextView distance;
     LocationManager locationManager;
     Double endlongitude=null;
     Double endlatitude=null;
+    Double distanceadd=0.0;
     boolean ck=false;
+    boolean ck2=false;
     public MainActivity() {
     }
 
@@ -30,19 +37,42 @@ public class MainActivity extends ActionBarActivity implements LocationListener{
         jingdu = (TextView)findViewById(R.id.jingdu);
         weidu = (TextView)findViewById(R.id.weidu);
         distance = (TextView)findViewById(R.id.distance);
-        jingdu.setText("0000");
-        weidu.setText("0000");
-        distance.setText("0000");
         locationManager=(LocationManager)getSystemService(getApplicationContext().LOCATION_SERVICE);
 
-        Log.i("map", "oncreat");
+        start = (Button)findViewById(R.id.button);
+        pause = (Button)findViewById(R.id.button2);
+        stop = (Button)findViewById(R.id.button3);
+        start.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ck2=true;
+                start.setText("started");
+                pause.setText("pause");
+            }
+        });
+        pause.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ck2=false;
+                pause.setText("paused");
+                start.setText("start again");
+            }
+            });
+        stop.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-    }
+            }
+        });
+
+                Log.i("map", "oncreat");
+
+        }
 
 
-    @Override
+        @Override
     protected void onResume() {
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000,10, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000,5, this);
         super.onResume();
     }
 
@@ -72,16 +102,23 @@ public class MainActivity extends ActionBarActivity implements LocationListener{
     public void onLocationChanged(Location location) {
         if(location != null) {
             Double longitude = location.getLongitude();   //取得經度
-            jingdu.setText(String.valueOf(longitude));
+            jingdu.setText("經度："+String.valueOf(longitude));
             Double latitude = location.getLatitude();     //取得緯度
-            weidu.setText(String.valueOf(latitude));
-            if((longitude != endlongitude || latitude != endlatitude ) &&ck){
+            weidu.setText("緯度："+String.valueOf(latitude));
+
+
+
+
+
+
+
+            if((longitude != endlongitude || latitude != endlatitude ) &&ck&&ck2){
                 //float[] results=new float[1];
                 //Location.distanceBetween(longitude, latitude, endlongitude, endlatitude, results);
                 //distance (longitude, latitude, endlongitude, endlatitude);
-                distance.setText(String.valueOf(distance(latitude, longitude, endlatitude, endlongitude)));
+                distance.setText("累積距離："+String.valueOf(distanceadd));
                 //distance.setText(String.valueOf(endlatitude)+" "+String.valueOf(endlongitude));
-
+                distanceadd=distanceadd+distance(latitude, longitude, endlatitude, endlongitude);
             }
 
             endlatitude = latitude;
@@ -92,6 +129,8 @@ public class MainActivity extends ActionBarActivity implements LocationListener{
         }
         ck=true;
     }
+
+    //計算距離公式
     private double distance(double lat1, double lon1, double lat2, double lon2) {
         double theta = lon1 - lon2;
         double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
